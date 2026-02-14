@@ -1,0 +1,536 @@
+@import "tailwindcss";
+
+/* ============================================
+   VELVET STAKES - High-End Casino Noir Theme
+   ============================================ */
+
+/* Typography - Cormorant Garamond (Display) + DM Sans (Body) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  /* Core Palette */
+  --noir: #050508;
+  --noir-soft: #0c0c10;
+  --noir-elevated: #141418;
+  --noir-card: #1a1a1f;
+  --noir-border: #2a2a32;
+
+  /* Accent Colors */
+  --gold: #d4af37;
+  --gold-dim: #a68a2a;
+  --gold-glow: rgba(212, 175, 55, 0.15);
+  --champagne: #f5e6c8;
+
+  /* State Colors */
+  --emerald: #10b981;
+  --emerald-deep: #065f46;
+  --emerald-glow: rgba(16, 185, 129, 0.12);
+
+  --crimson: #dc2626;
+  --crimson-deep: #7f1d1d;
+  --crimson-glow: rgba(220, 38, 38, 0.12);
+
+  --amber: #f59e0b;
+  --amber-deep: #78350f;
+  --amber-glow: rgba(245, 158, 11, 0.12);
+
+  /* Text Colors */
+  --text-primary: #f5f5f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #6b6b73;
+
+  /* Gradients */
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f5d77a 50%, #d4af37 100%);
+  --gradient-emerald: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  --gradient-crimson: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+
+  /* Shadows */
+  --shadow-gold: 0 4px 24px rgba(212, 175, 55, 0.2);
+  --shadow-emerald: 0 4px 24px rgba(16, 185, 129, 0.25);
+  --shadow-crimson: 0 4px 24px rgba(220, 38, 38, 0.25);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  /* Typography Scale */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  /* Animations */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@theme inline {
+  --color-background: var(--noir);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+html {
+  background: var(--noir);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--noir);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Noise texture overlay for depth */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.text-gold {
+  color: var(--gold);
+}
+
+.text-gold-gradient {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   Custom Components
+   ============================================ */
+
+/* Card Styles */
+.card-noir {
+  background: var(--noir-card);
+  border: 1px solid var(--noir-border);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-noir::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+.card-gold {
+  background: var(--noir-card);
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  box-shadow: var(--shadow-gold);
+}
+
+.card-emerald {
+  background: linear-gradient(135deg, var(--emerald-deep) 0%, var(--noir-card) 100%);
+  border: 1px solid var(--emerald);
+  border-radius: 16px;
+  box-shadow: var(--shadow-emerald);
+}
+
+.card-crimson {
+  background: linear-gradient(135deg, var(--crimson-deep) 0%, var(--noir-card) 100%);
+  border: 1px solid var(--crimson);
+  border-radius: 16px;
+  box-shadow: var(--shadow-crimson);
+}
+
+.card-amber {
+  background: linear-gradient(135deg, var(--amber-deep) 0%, var(--noir-card) 100%);
+  border: 1px solid var(--amber);
+  border-radius: 16px;
+}
+
+/* Button Styles */
+.btn-stakes {
+  position: relative;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  transition: all 0.2s var(--ease-smooth);
+  overflow: hidden;
+}
+
+.btn-stakes::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+.btn-stakes:active {
+  transform: scale(0.97);
+}
+
+.btn-gold {
+  background: var(--gradient-gold);
+  color: var(--noir);
+  border: none;
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-gold:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 32px rgba(212, 175, 55, 0.35);
+}
+
+.btn-win {
+  background: var(--gradient-emerald);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-emerald);
+}
+
+.btn-win:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 32px rgba(16, 185, 129, 0.4);
+}
+
+.btn-loss {
+  background: var(--gradient-crimson);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-crimson);
+}
+
+.btn-loss:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 32px rgba(220, 38, 38, 0.4);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--noir-border);
+}
+
+.btn-ghost:hover {
+  background: var(--noir-elevated);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* ============================================
+   Stake Display
+   ============================================ */
+
+.stake-display {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 600;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .stake-display {
+    font-size: 5rem;
+  }
+}
+
+/* ============================================
+   PnL Display
+   ============================================ */
+
+.pnl-positive {
+  color: var(--emerald);
+  text-shadow: 0 0 30px var(--emerald-glow);
+}
+
+.pnl-negative {
+  color: var(--crimson);
+  text-shadow: 0 0 30px var(--crimson-glow);
+}
+
+/* ============================================
+   Ladder Visualization
+   ============================================ */
+
+.ladder-rung {
+  position: relative;
+  padding: 8px 12px;
+  background: var(--noir-elevated);
+  border-left: 3px solid var(--noir-border);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.ladder-rung.active {
+  background: var(--gold-glow);
+  border-left-color: var(--gold);
+}
+
+.ladder-rung.active::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--gold);
+}
+
+/* ============================================
+   Recovery Banner
+   ============================================ */
+
+.recovery-banner {
+  background: linear-gradient(
+    90deg,
+    var(--amber-glow) 0%,
+    transparent 50%,
+    var(--amber-glow) 100%
+  );
+  border: 1px solid var(--amber);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.35);
+  }
+}
+
+/* ============================================
+   Decision Cards (Roguelike)
+   ============================================ */
+
+.decision-card {
+  position: relative;
+  padding: 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-spring);
+  transform-style: preserve-3d;
+}
+
+.decision-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.decision-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.decision-card.carry-over {
+  background: linear-gradient(145deg, var(--emerald-deep) 0%, var(--noir-card) 100%);
+  border: 2px solid var(--emerald);
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.2),
+    0 8px 32px rgba(16, 185, 129, 0.2);
+}
+
+.decision-card.carry-over:hover {
+  box-shadow:
+    0 0 0 2px var(--emerald),
+    0 12px 48px rgba(16, 185, 129, 0.35);
+}
+
+.decision-card.write-off {
+  background: linear-gradient(145deg, var(--amber-deep) 0%, var(--noir-card) 100%);
+  border: 2px solid var(--amber);
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, 0.2),
+    0 8px 32px rgba(245, 158, 11, 0.2);
+}
+
+.decision-card.write-off:hover {
+  box-shadow:
+    0 0 0 2px var(--amber),
+    0 12px 48px rgba(245, 158, 11, 0.35);
+}
+
+.decision-card.stop-session {
+  background: linear-gradient(145deg, var(--crimson-deep) 0%, var(--noir-card) 100%);
+  border: 2px solid var(--crimson);
+  box-shadow:
+    0 0 0 1px rgba(220, 38, 38, 0.2),
+    0 8px 32px rgba(220, 38, 38, 0.2);
+}
+
+.decision-card.stop-session:hover {
+  box-shadow:
+    0 0 0 2px var(--crimson),
+    0 12px 48px rgba(220, 38, 38, 0.35);
+}
+
+/* ============================================
+   Progress Bars
+   ============================================ */
+
+.progress-track {
+  height: 6px;
+  background: var(--noir-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s var(--ease-smooth);
+}
+
+.progress-fill.gold {
+  background: var(--gradient-gold);
+}
+
+.progress-fill.emerald {
+  background: var(--gradient-emerald);
+}
+
+.progress-fill.crimson {
+  background: var(--gradient-crimson);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s var(--ease-spring) forwards;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s var(--ease-spring) forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gold-dim) 0%,
+    var(--gold) 50%,
+    var(--gold-dim) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Stagger animations */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+.bg-noir { background-color: var(--noir); }
+.bg-noir-soft { background-color: var(--noir-soft); }
+.bg-noir-elevated { background-color: var(--noir-elevated); }
+.bg-noir-card { background-color: var(--noir-card); }
+
+.border-noir { border-color: var(--noir-border); }
+.border-gold { border-color: var(--gold); }
+.border-emerald { border-color: var(--emerald); }
+.border-crimson { border-color: var(--crimson); }
+
+.text-gold { color: var(--gold); }
+.text-champagne { color: var(--champagne); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+.shadow-gold { box-shadow: var(--shadow-gold); }
+.shadow-elevated { box-shadow: var(--shadow-elevated); }
+
+/* Divider with gold accent */
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--gold-dim) 20%,
+    var(--gold) 50%,
+    var(--gold-dim) 80%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   Safe Area (PWA)
+   ============================================ */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
