@@ -176,10 +176,9 @@ export default function SetupPage() {
               Warning
             </div>
             <p className="text-pink-50 font-semibold leading-relaxed">
-              Warning ONLY use on games with house edge under 1.5% ideally under 1%.
-              Every 10th of a percent higher than 1 adds up QUICK with this strategy.
-              If you lose money on side bets DO NOT count it as part of your pattern,
-              if you get blackjack / win money treat the extra money as found money.
+              Warning: USE ONLY on games with house edge under 1.5% ideally under 1%.
+              Every tiny bit higher than 1 adds up QUICK with this strategy.
+              
             </p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <Button
