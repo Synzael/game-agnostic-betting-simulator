@@ -141,4 +141,5 @@ export const DEFAULT_SESSION_CONFIG = {
   profitTarget: 500,
   stopLossAbs: 1000,
   maxRounds: 5000,
+  startingLadder: 0,
 } as const;

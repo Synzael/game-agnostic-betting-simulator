@@ -20,14 +20,23 @@ import { getStake, getMaxIndex, isAtTop } from "./ladder";
 /**
  * Create initial session state.
  */
-export function createInitialState(strategy: StrategyConfig): SessionState {
+export function createInitialState(
+  strategy: StrategyConfig,
+  startingLadder: number = 0
+): SessionState {
   const ladderTouches: Record<number, number> = {};
   strategy.ladders.forEach((_, i) => {
     ladderTouches[i] = 0;
   });
 
+  // Clamp starting ladder to valid range
+  const validStartingLadder = Math.max(
+    0,
+    Math.min(startingLadder, strategy.ladders.length - 1)
+  );
+
   return {
-    currentLadder: 0,
+    currentLadder: validStartingLadder,
     currentIndex: 0,
     pnl: 0,
     rounds: 0,

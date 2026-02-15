@@ -5,6 +5,16 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 type EntitlementSource = "app_store" | "restored" | "dev_override";
 
+export function hasPremiumEntitlement(
+  isPremium: boolean,
+  expiresAt: number | null,
+  now: number = Date.now()
+): boolean {
+  if (!isPremium) return false;
+  if (expiresAt === null) return true;
+  return now < expiresAt;
+}
+
 interface PremiumStore {
   isPremium: boolean;
   source: EntitlementSource | null;
@@ -43,9 +53,7 @@ export const usePremiumStore = create<PremiumStore>()(
 
       hasPremiumAccess: () => {
         const { isPremium, expiresAt } = get();
-        if (!isPremium) return false;
-        if (expiresAt === null) return true;
-        return Date.now() < expiresAt;
+        return hasPremiumEntitlement(isPremium, expiresAt);
       },
     }),
     {

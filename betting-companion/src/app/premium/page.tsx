@@ -6,15 +6,17 @@ import { Capacitor } from "@capacitor/core";
 import { Button, Card, CardContent } from "@/components/ui";
 import { usePremiumStore } from "@/store";
 import { restorePremiumEntitlement } from "@/lib/premium-entitlements";
+import { hasPremiumEntitlement } from "@/store/premium-store";
 
 const allowDevOverride = process.env.NEXT_PUBLIC_ALLOW_DEV_PREMIUM_OVERRIDE === "1";
 
 export default function PremiumPage() {
-  const hasPremiumAccess = usePremiumStore((s) => s.hasPremiumAccess());
+  const isPremium = usePremiumStore((s) => s.isPremium);
   const markPremium = usePremiumStore((s) => s.markPremium);
   const clearPremium = usePremiumStore((s) => s.clearPremium);
   const source = usePremiumStore((s) => s.source);
   const expiresAt = usePremiumStore((s) => s.expiresAt);
+  const hasPremiumAccess = hasPremiumEntitlement(isPremium, expiresAt);
 
   const [isRestoring, setIsRestoring] = useState(false);
   const [status, setStatus] = useState<string | null>(null);

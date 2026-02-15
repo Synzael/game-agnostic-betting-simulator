@@ -38,6 +38,7 @@ export interface SessionConfig {
   readonly stopLossAbs: number;
   readonly maxRounds: number;
   readonly tableMax?: number;
+  readonly startingLadder: number; // 0, 1, or 2 for L1, L2, L3
 }
 
 /**

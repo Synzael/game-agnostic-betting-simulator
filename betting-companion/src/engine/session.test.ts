@@ -39,6 +39,7 @@ const createTestConfig = (): SessionConfig => ({
   profitTarget: 500,
   stopLossAbs: 500,
   maxRounds: 100,
+  startingLadder: 0,
 });
 
 describe('createInitialState', () => {
@@ -87,6 +88,38 @@ describe('createInitialState', () => {
 
     expect(state.inRecovery).toBe(false);
     expect(state.recoveryTargetPnl).toBe(0);
+  });
+
+  it('starts at specified ladder when startingLadder is provided', () => {
+    const strategy = createTestStrategy();
+    const state = createInitialState(strategy, 1);
+
+    expect(state.currentLadder).toBe(1);
+    expect(state.currentIndex).toBe(0);
+  });
+
+  it('clamps negative startingLadder to 0', () => {
+    const strategy = createTestStrategy();
+    const state = createInitialState(strategy, -5);
+
+    expect(state.currentLadder).toBe(0);
+  });
+
+  it('clamps startingLadder beyond max to last ladder', () => {
+    const strategy = createTestStrategy(); // 3 ladders (0, 1, 2)
+    const state = createInitialState(strategy, 10);
+
+    expect(state.currentLadder).toBe(2);
+  });
+
+  it('initializes ladder touches correctly when starting at higher ladder', () => {
+    const strategy = createTestStrategy();
+    const state = createInitialState(strategy, 2);
+
+    // All ladders should still have 0 touches initially
+    expect(state.ladderTouches[0]).toBe(0);
+    expect(state.ladderTouches[1]).toBe(0);
+    expect(state.ladderTouches[2]).toBe(0);
   });
 });
 
