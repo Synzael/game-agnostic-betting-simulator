@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useSessionStore, useHistoryStore } from "@/store";
-import { Button } from "@/components/ui";
+import { Capacitor } from "@capacitor/core";
+import { useSessionStore, useHistoryStore, usePremiumStore } from "@/store";
 
 export default function Home() {
   const isSessionActive = useSessionStore((s) => s.isSessionActive);
   const stats = useHistoryStore((s) => s.getStats());
+  const hasPremiumAccess = usePremiumStore((s) => s.hasPremiumAccess());
+
+  const isNative = Capacitor.isNativePlatform();
+  const premiumRequired = isNative && !hasPremiumAccess;
 
   return (
     <div className="min-h-screen bg-noir p-4 flex flex-col">
@@ -25,12 +29,28 @@ export default function Home() {
         <p className="text-secondary text-sm tracking-wide">
           Your roguelike betting strategy companion
         </p>
+        <div className="mt-4 inline-flex items-center rounded-full border border-[var(--gold-dim)] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-secondary">
+          {isNative ? (premiumRequired ? "Premium Required" : "Premium Active") : "Web Mode"}
+        </div>
       </div>
 
       {/* Main Actions */}
       <div className="flex-1 flex flex-col gap-4 max-w-md mx-auto w-full">
+        {premiumRequired && (
+          <Link href="/premium" className="block animate-fadeInUp">
+            <div className="card-gold p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+              <div className="font-display text-xl text-gold">
+                Unlock Premium
+              </div>
+              <div className="text-xs text-secondary mt-1">
+                Restore your subscription to run fully offline on iOS.
+              </div>
+            </div>
+          </Link>
+        )}
+
         {/* Resume Session (if active) */}
-        {isSessionActive() && (
+        {isSessionActive() && !premiumRequired && (
           <Link href="/session" className="block animate-fadeInUp">
             <div className="card-gold p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
               <div className="flex items-center gap-4">
@@ -53,8 +73,12 @@ export default function Home() {
         )}
 
         {/* New Session */}
-        <Link href="/setup" className="block animate-fadeInUp stagger-1">
-          <div className="card-emerald p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02]">
+        <Link href={premiumRequired ? "/premium" : "/setup"} className="block animate-fadeInUp stagger-1">
+          <div
+            className={`card-emerald p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+              premiumRequired ? "opacity-60" : ""
+            }`}
+          >
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-[var(--emerald)]/20 flex items-center justify-center">
                 <svg className="w-7 h-7 text-[var(--emerald)]" fill="currentColor" viewBox="0 0 20 20">
@@ -63,10 +87,12 @@ export default function Home() {
               </div>
               <div>
                 <div className="font-display text-xl text-[var(--emerald)]">
-                  {isSessionActive() ? "New Session" : "Start Session"}
+                  {premiumRequired ? "Premium Unlock Needed" : isSessionActive() ? "New Session" : "Start Session"}
                 </div>
                 <div className="text-xs text-secondary mt-0.5">
-                  Configure and begin a new betting session
+                  {premiumRequired
+                    ? "Subscribe once and continue fully offline on iOS."
+                    : "Configure and begin a new betting session"}
                 </div>
               </div>
             </div>
@@ -74,8 +100,12 @@ export default function Home() {
         </Link>
 
         {/* History */}
-        <Link href="/history" className="block animate-fadeInUp stagger-2">
-          <div className="card-noir p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-[var(--gold-dim)]">
+        <Link href={premiumRequired ? "/premium" : "/history"} className="block animate-fadeInUp stagger-2">
+          <div
+            className={`card-noir p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-[var(--gold-dim)] ${
+              premiumRequired ? "opacity-60" : ""
+            }`}
+          >
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-[var(--noir-elevated)] flex items-center justify-center">
                 <svg className="w-7 h-7 text-secondary" fill="currentColor" viewBox="0 0 20 20">
@@ -131,7 +161,7 @@ export default function Home() {
 
       {/* Footer */}
       <div className="text-center py-6 text-[10px] text-muted uppercase tracking-wider">
-        Offline-first PWA • Your data stays local
+        Offline-first • Local data only • Native iOS ready
       </div>
     </div>
   );

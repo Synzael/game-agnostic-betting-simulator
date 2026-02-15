@@ -1,11 +1,9 @@
+/* Typography - Offline-first system font stack */
 @import "tailwindcss";
 
 /* ============================================
    VELVET STAKES - High-End Casino Noir Theme
    ============================================ */
-
-/* Typography - Cormorant Garamond (Display) + DM Sans (Body) */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 :root {
   /* Core Palette */
@@ -51,8 +49,8 @@
   --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
 
   /* Typography Scale */
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+  --font-body: "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
 
   /* Animations */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
