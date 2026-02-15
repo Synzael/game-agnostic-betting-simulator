@@ -11,6 +11,8 @@ import {
   DEFAULT_SESSION_CONFIG,
   SessionConfig,
   PresetConfig,
+  DEFAULT_LADDERS,
+  formatStake,
 } from "@/engine";
 
 interface SetupValidationErrors {
@@ -156,6 +158,36 @@ export default function SetupPage() {
               hint="Session ends if you lose this amount"
               error={validationErrors.stopLossAbs}
             />
+          </div>
+        </div>
+
+        {/* Starting Ladder */}
+        <div>
+          <h2 className="text-sm text-slate-400 uppercase tracking-wide mb-3">
+            Starting Ladder
+          </h2>
+          <div className="grid grid-cols-3 gap-2">
+            {DEFAULT_LADDERS.map((ladder, index) => {
+              const minStake = ladder.stakes[0];
+              const maxStake = ladder.stakes[ladder.stakes.length - 1];
+              return (
+                <Card
+                  key={ladder.name}
+                  variant={config.startingLadder === index ? "info" : "default"}
+                  interactive
+                  selected={config.startingLadder === index}
+                  className="p-3"
+                  onClick={() => updateConfig({ startingLadder: index })}
+                >
+                  <div className="font-medium text-white text-sm">
+                    {ladder.name}
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">
+                    {formatStake(minStake)} – {formatStake(maxStake)}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
 

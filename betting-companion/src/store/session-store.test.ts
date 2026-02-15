@@ -9,6 +9,7 @@ const createTestConfig = (): SessionConfig => ({
   profitTarget: 500,
   stopLossAbs: 500,
   maxRounds: 100,
+  startingLadder: 0,
 });
 
 const createTestStrategy = (): StrategyConfig => ({
@@ -80,6 +81,17 @@ describe('useSessionStore', () => {
       expect(state?.currentIndex).toBe(0);
       expect(state?.pnl).toBe(0);
       expect(state?.rounds).toBe(0);
+    });
+
+    it('starts session at specified starting ladder from config', () => {
+      const config = { ...createTestConfig(), startingLadder: 1 };
+      const strategy = createTestStrategy();
+
+      useSessionStore.getState().startSession(config, strategy);
+
+      const { state } = useSessionStore.getState();
+      expect(state?.currentLadder).toBe(1);
+      expect(state?.currentIndex).toBe(0);
     });
   });
 

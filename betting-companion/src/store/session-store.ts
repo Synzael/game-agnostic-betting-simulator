@@ -64,7 +64,7 @@ export const useSessionStore = create<SessionStore>()(
         set({
           config,
           strategy,
-          state: createInitialState(strategy),
+          state: createInitialState(strategy, config.startingLadder),
           betHistory: [],
           startTime: Date.now(),
         });
