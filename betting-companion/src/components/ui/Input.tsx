@@ -1,6 +1,6 @@
 "use client";
 
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, useState } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -66,13 +66,43 @@ export function NumberInput({
   max,
   step = 1,
   prefix,
+  onBlur,
+  onFocus,
   ...props
 }: NumberInputProps) {
+  const [textValue, setTextValue] = useState(String(value));
+  const [isFocused, setIsFocused] = useState(false);
+  const displayValue = isFocused ? textValue : String(value);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseFloat(e.target.value) || 0;
-    if (min !== undefined && newValue < min) return;
-    if (max !== undefined && newValue > max) return;
-    onChange(newValue);
+    const nextText = e.target.value;
+    setTextValue(nextText);
+
+    // Allow natural editing (including temporary empty/partial values).
+    if (nextText === "") return;
+
+    const parsed = Number(nextText);
+    if (Number.isNaN(parsed)) return;
+    onChange(parsed);
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    setTextValue(String(value));
+    onFocus?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    const parsed = Number(textValue);
+    if (textValue !== "" && !Number.isNaN(parsed)) {
+      onChange(parsed);
+      setTextValue(String(parsed));
+    } else {
+      setTextValue(String(value));
+    }
+
+    onBlur?.(e);
   };
 
   return (
@@ -84,8 +114,10 @@ export function NumberInput({
       )}
       <Input
         type="number"
-        value={value}
+        value={displayValue}
         onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         min={min}
         max={max}
         step={step}

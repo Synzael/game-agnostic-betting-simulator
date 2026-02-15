@@ -13,6 +13,32 @@ import {
   PresetConfig,
 } from "@/engine";
 
+interface SetupValidationErrors {
+  bankroll?: string;
+  profitTarget?: string;
+  stopLossAbs?: string;
+}
+
+function validateSessionConfig(config: SessionConfig): SetupValidationErrors {
+  const errors: SetupValidationErrors = {};
+
+  if (config.bankroll <= 0) {
+    errors.bankroll = "Bankroll must be greater than 0.";
+  }
+
+  if (config.profitTarget <= 0) {
+    errors.profitTarget = "Profit target must be greater than 0.";
+  }
+
+  if (config.stopLossAbs <= 0) {
+    errors.stopLossAbs = "Stop loss must be greater than 0.";
+  } else if (config.stopLossAbs > config.bankroll) {
+    errors.stopLossAbs = "Stop loss cannot be greater than bankroll.";
+  }
+
+  return errors;
+}
+
 export default function SetupPage() {
   const router = useRouter();
   const startSession = useSessionStore((s) => s.startSession);
@@ -25,12 +51,22 @@ export default function SetupPage() {
   const [config, setConfig] = useState<SessionConfig>({
     ...DEFAULT_SESSION_CONFIG,
   });
+  const [showValidationSummary, setShowValidationSummary] = useState(false);
+
+  const validationErrors = validateSessionConfig(config);
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
 
   const handlePresetSelect = (preset: PresetConfig) => {
     setSelectedPreset(preset.name);
   };
 
   const handleStartSession = () => {
+    if (hasValidationErrors) {
+      setShowValidationSummary(true);
+      return;
+    }
+
+    setShowValidationSummary(false);
     setShowWarningModal(true);
   };
 
@@ -97,25 +133,28 @@ export default function SetupPage() {
               label="Starting Bankroll"
               value={config.bankroll}
               onChange={(v) => updateConfig({ bankroll: v })}
-              min={100}
+              min={0}
               prefix="$"
               hint="Your starting balance"
+              error={validationErrors.bankroll}
             />
             <NumberInput
               label="Profit Target"
               value={config.profitTarget}
               onChange={(v) => updateConfig({ profitTarget: v })}
-              min={10}
+              min={0}
               prefix="$"
               hint="Session ends when you reach this profit"
+              error={validationErrors.profitTarget}
             />
             <NumberInput
               label="Stop Loss"
               value={config.stopLossAbs}
               onChange={(v) => updateConfig({ stopLossAbs: v })}
-              min={10}
+              min={0}
               prefix="$"
               hint="Session ends if you lose this amount"
+              error={validationErrors.stopLossAbs}
             />
           </div>
         </div>
@@ -158,6 +197,11 @@ export default function SetupPage() {
         </div>
 
         {/* Start Button */}
+        {showValidationSummary && hasValidationErrors && (
+          <p className="text-sm text-red-400">
+            Please fix invalid session settings before starting.
+          </p>
+        )}
         <Button
           variant="success"
           size="xl"
