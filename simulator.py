@@ -44,6 +44,8 @@ from pathlib import Path
 import csv
 from datetime import datetime
 
+from logging_config import SimulatorLogger, configure_simulator_logging
+
 
 # ============================================================================
 # Core Data Structures
@@ -207,6 +209,9 @@ class SessionSimulator:
         self.in_recovery = False
         self.recovery_target_pnl = 0.0
 
+        # Logger for recovery and bridging events
+        self._logger = SimulatorLogger()
+
     @property
     def current_stake(self) -> float:
         """Get the current stake based on ladder position."""
@@ -282,15 +287,36 @@ class SessionSimulator:
                         # Edge case: in profit, no recovery needed
                         self.recovery_target_pnl = self.pnl
 
+                    # Log recovery mode entry
+                    self._logger.log_recovery_enter(
+                        pnl=self.pnl,
+                        target=self.recovery_target_pnl,
+                        recovery_pct=self.strategy.recovery_target_pct,
+                        ladder=self.current_ladder,
+                        index=self.current_index,
+                    )
+
                 # Advance to next ladder (or stop if at last)
                 if at_last_ladder:
                     self.stopped = True
                     self.stop_reason = "table_limit"
                     return True
                 else:
+                    old_ladder = self.current_ladder
+                    old_index = self.current_index
                     self.current_ladder += 1
                     # Start at crossover_offset index in next ladder
                     self.current_index = self.strategy.crossover_offset
+
+                    # Log ladder bridge
+                    self._logger.log_ladder_bridge(
+                        from_ladder=old_ladder,
+                        from_index=old_index,
+                        to_ladder=self.current_ladder,
+                        to_index=self.current_index,
+                        offset=self.strategy.crossover_offset,
+                        stake=self.current_stake,
+                    )
 
             elif self.strategy.bridging_policy == "stop_at_table_limit":
                 # Treat as hard stop
@@ -307,6 +333,11 @@ class SessionSimulator:
 
             # Check for recovery completion (only for carry_over_index_delta)
             if self.in_recovery and self.pnl >= self.recovery_target_pnl:
+                # Log recovery exit before resetting
+                self._logger.log_recovery_exit(
+                    pnl=self.pnl,
+                    target=self.recovery_target_pnl,
+                )
                 # Recovery achieved - reset to ladder 0, index 0
                 self.in_recovery = False
                 self.recovery_target_pnl = 0.0
@@ -894,23 +925,82 @@ def main():
         "--max-rounds", type=int, default=5000, help="Max rounds (default: 5000)"
     )
     parser.add_argument("--run-tests", action="store_true", help="Run unit tests")
-    
+    parser.add_argument(
+        "--config",
+        type=str,
+        help="Path to .ini config file with presets",
+    )
+    parser.add_argument(
+        "--preset",
+        type=str,
+        default="DEFAULT",
+        help="Preset name from config file (default: DEFAULT)",
+    )
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="WARNING",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Log level (default: WARNING)",
+    )
+    parser.add_argument(
+        "--recovery-target-pct",
+        type=float,
+        help="Recovery target percentage (overrides preset)",
+    )
+    parser.add_argument(
+        "--crossover-offset",
+        type=int,
+        help="Crossover offset for bridging (overrides preset)",
+    )
+
     args = parser.parse_args()
     
     if args.run_tests:
         test_step_logic()
         test_bridging_policies()
         return
-    
+
+    # Configure logging
+    configure_simulator_logging(level=args.log_level)
+
     # Parse profit target grid
     grid_parts = args.profit_target_grid.split(":")
     if len(grid_parts) != 3:
         raise ValueError("profit-target-grid must be in format min:max:step")
     target_min, target_max, target_step = map(float, grid_parts)
-    
-    # Setup
+
+    # Setup ladders
     ladders = create_default_ladders()
-    strategy = StrategyConfig(ladders=ladders, bridging_policy=args.policy)
+
+    # Load strategy from preset or CLI arguments
+    if args.config:
+        from pathlib import Path as PathLib
+        from config import load_preset, merge_cli_with_preset, create_strategy_from_preset
+
+        preset = load_preset(PathLib(args.config), args.preset)
+        # Apply CLI overrides
+        preset = merge_cli_with_preset(
+            preset,
+            cli_policy=args.policy if args.policy != "advance_to_next_ladder_start" else None,
+            cli_recovery_pct=args.recovery_target_pct,
+            cli_offset=args.crossover_offset,
+        )
+        strategy = create_strategy_from_preset(preset, ladders)
+        print(f"Loaded preset '{args.preset}' from {args.config}")
+        print(f"  Policy: {preset.bridging_policy}")
+        print(f"  Recovery target: {preset.recovery_target_pct * 100:.0f}%")
+        print(f"  Crossover offset: {preset.crossover_offset}")
+    else:
+        # Use CLI arguments directly
+        recovery_pct = args.recovery_target_pct if args.recovery_target_pct else 0.5
+        crossover_offset = args.crossover_offset if args.crossover_offset else 0
+        strategy = StrategyConfig(
+            ladders=ladders,
+            bridging_policy=args.policy,
+            recovery_target_pct=recovery_pct,
+            crossover_offset=crossover_offset,
+        )
     
     game = GameSpec(name="even_money", payout_ratio=1.0, p_win=0.495)
     

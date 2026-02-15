@@ -1,5 +1,5 @@
 
-from simulator import StrategyConfig, SessionConfig, SessionSimulator, LadderSpec
+from simulator import StrategyConfig, SessionConfig, SessionSimulator, LadderSpec, GameSpec
 import numpy as np
 
 def verify_carry_over_logic():
@@ -13,12 +13,13 @@ def verify_carry_over_logic():
     
     # Config: Recover 50% of loss, Offset 1 (start at index 1 of next ladder)
     strategy = StrategyConfig(
-        ladders=ladders, 
+        ladders=ladders,
         bridging_policy="carry_over_index_delta",
         recovery_target_pct=0.5,
         crossover_offset=1
     )
-    config = SessionConfig(bankroll=10000, profit_target=1000, stop_loss_abs=1000)
+    game = GameSpec(name="even_money", payout_ratio=1.0, p_win=0.495)
+    config = SessionConfig(bankroll=10000, profit_target=1000, stop_loss_abs=1000, game_spec=game)
     rng = np.random.default_rng(42)
     
     sim = SessionSimulator(strategy, config, rng)
