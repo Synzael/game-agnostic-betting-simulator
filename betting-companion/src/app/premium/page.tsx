@@ -48,7 +48,7 @@ export default function PremiumPage() {
             <div className="text-sm text-secondary">
               {hasPremiumAccess
                 ? "Offline mode is enabled. Your sessions and history stay on this device."
-                : "Activate premium to use the iOS app without any internet connection."}
+                : "Activate premium to use the iOS or Android app without any internet connection."}
             </div>
             {source && (
               <div className="text-xs uppercase tracking-[0.12em] text-muted">
@@ -75,7 +75,7 @@ export default function PremiumPage() {
           </Button>
           {!isNative && (
             <p className="text-xs text-muted">
-              Restore is available only in the native iOS app.
+              Restore is available only in the native iOS/Android app.
             </p>
           )}
           {status && <p className="text-sm text-secondary">{status}</p>}

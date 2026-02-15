@@ -1,7 +1,7 @@
-# iOS Offline Wrapper (Premium)
+# Android Offline Wrapper (Premium)
 
-This app can be packaged as an offline iOS app using Capacitor.  
-All UI/logic is bundled from the static `out/` export, so runtime internet is not required.
+This app can be packaged as an offline Android app using Capacitor.  
+All UI and logic are bundled from the static `out/` export, so runtime internet is not required.
 
 ## What is already wired
 
@@ -13,37 +13,32 @@ All UI/logic is bundled from the static `out/` export, so runtime internet is no
 
 ## Prerequisites
 
-- Xcode (latest stable)
-- CocoaPods
+- Android Studio (latest stable)
+- Android SDK + platform tools
+- Java 17+
 - Node.js + npm
 
-Install CocoaPods (if missing):
-
-```bash
-brew install cocoapods
-```
-
-## First-time iOS setup
+## First-time Android setup
 
 From `betting-companion`:
 
 ```bash
 npm install
-npx cap add ios
+npx cap add android
 ```
 
-## Build and sync iOS app
+## Build and sync Android app
 
 ```bash
-npm run cap:sync:ios
-npm run ios:open
+npm run cap:sync:android
+npm run android:open
 ```
 
-Then run from Xcode on a simulator/device.
+Then run from Android Studio on an emulator/device.
 
 ## Premium entitlement bridge contract
 
-The web app expects an optional native bridge (shared with Android):
+The web app expects an optional native bridge:
 
 - `window.premiumBridge.restorePurchases(): Promise<{ active: boolean; expiresAt?: number | null }>`
 

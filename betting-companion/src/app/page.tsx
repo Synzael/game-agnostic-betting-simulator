@@ -43,7 +43,7 @@ export default function Home() {
                 Unlock Premium
               </div>
               <div className="text-xs text-secondary mt-1">
-                Restore your subscription to run fully offline on iOS.
+                Restore your subscription to run fully offline on iOS and Android.
               </div>
             </div>
           </Link>
@@ -91,7 +91,7 @@ export default function Home() {
                 </div>
                 <div className="text-xs text-secondary mt-0.5">
                   {premiumRequired
-                    ? "Subscribe once and continue fully offline on iOS."
+                    ? "Subscribe once and continue fully offline on iOS and Android."
                     : "Configure and begin a new betting session"}
                 </div>
               </div>
@@ -161,7 +161,7 @@ export default function Home() {
 
       {/* Footer */}
       <div className="text-center py-6 text-[10px] text-muted uppercase tracking-wider">
-        Offline-first • Local data only • Native iOS ready
+        Offline-first • Local data only • Native iOS + Android ready
       </div>
     </div>
   );

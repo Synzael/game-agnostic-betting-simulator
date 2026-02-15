@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appId: "com.synzael.betcompanion",
   appName: "Velvet Stakes",
   webDir: "out",
+  android: {
+    backgroundColor: "#050508",
+  },
   ios: {
     contentInset: "always",
     backgroundColor: "#050508",
