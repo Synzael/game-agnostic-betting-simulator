@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSessionStore } from "@/store";
-import { Button, Card, CardContent, NumberInput } from "@/components/ui";
+import { Button, Card, NumberInput } from "@/components/ui";
 import {
   getAllPresets,
   createStrategyFromPreset,
@@ -21,6 +21,7 @@ export default function SetupPage() {
 
   const presets = getAllPresets();
   const [selectedPreset, setSelectedPreset] = useState<string>("default");
+  const [showWarningModal, setShowWarningModal] = useState(false);
   const [config, setConfig] = useState<SessionConfig>({
     ...DEFAULT_SESSION_CONFIG,
   });
@@ -30,8 +31,13 @@ export default function SetupPage() {
   };
 
   const handleStartSession = () => {
+    setShowWarningModal(true);
+  };
+
+  const confirmStartSession = () => {
     const strategy = createStrategyFromPreset(selectedPreset);
     startSession(config, strategy);
+    setShowWarningModal(false);
     router.push("/session");
   };
 
@@ -162,6 +168,40 @@ export default function SetupPage() {
           Start Session
         </Button>
       </div>
+
+      {showWarningModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-2xl border-2 border-pink-400 bg-pink-950/90 p-5 shadow-[0_0_40px_rgba(236,72,153,0.35)]">
+            <div className="text-xs uppercase tracking-[0.2em] text-pink-200 mb-2">
+              Warning
+            </div>
+            <p className="text-pink-50 font-semibold leading-relaxed">
+              Warning ONLY use on games with house edge under 1.5% ideally under 1%.
+              Every 10th of a percent higher than 1 adds up QUICK with this strategy.
+              If you lose money on side bets DO NOT count it as part of your pattern,
+              if you get blackjack / win money treat the extra money as found money.
+            </p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                size="md"
+                fullWidth
+                onClick={() => setShowWarningModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="md"
+                fullWidth
+                onClick={confirmStartSession}
+              >
+                I Understand
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
