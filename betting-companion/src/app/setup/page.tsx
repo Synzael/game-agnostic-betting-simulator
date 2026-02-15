@@ -253,7 +253,7 @@ export default function SetupPage() {
             </div>
             <p className="text-pink-50 font-semibold leading-relaxed">
               Warning: USE ONLY on games with house edge under 1.5% ideally under 1%.
-              Every tiny bit higher than 1 adds up QUICK with this strategy.
+              Every tiny bit higher than 1% adds up QUICK with this strategy.
               
             </p>
             <div className="mt-5 grid grid-cols-2 gap-2">

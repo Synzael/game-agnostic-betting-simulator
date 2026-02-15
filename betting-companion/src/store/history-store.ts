@@ -9,7 +9,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { SessionResult } from "@/engine/types";
 
-interface HistoryStats {
+export interface HistoryStats {
   totalSessions: number;
   winCount: number;
   lossCount: number;
@@ -35,7 +35,7 @@ interface HistoryStore {
   getStats: () => HistoryStats;
 }
 
-const EMPTY_STATS: HistoryStats = {
+export const EMPTY_HISTORY_STATS: HistoryStats = {
   totalSessions: 0,
   winCount: 0,
   lossCount: 0,
@@ -46,6 +46,30 @@ const EMPTY_STATS: HistoryStats = {
   bestSession: 0,
   worstSession: 0,
 };
+
+export function calculateHistoryStats(sessions: SessionResult[]): HistoryStats {
+  if (sessions.length === 0) {
+    return EMPTY_HISTORY_STATS;
+  }
+
+  const winCount = sessions.filter((s) => s.hitTarget).length;
+  const lossCount = sessions.length - winCount;
+  const totalPnl = sessions.reduce((sum, s) => sum + s.finalPnl, 0);
+  const totalRounds = sessions.reduce((sum, s) => sum + s.roundsPlayed, 0);
+  const pnls = sessions.map((s) => s.finalPnl);
+
+  return {
+    totalSessions: sessions.length,
+    winCount,
+    lossCount,
+    winRate: (winCount / sessions.length) * 100,
+    totalPnl,
+    avgPnl: totalPnl / sessions.length,
+    avgRounds: totalRounds / sessions.length,
+    bestSession: Math.max(...pnls),
+    worstSession: Math.min(...pnls),
+  };
+}
 
 export const useHistoryStore = create<HistoryStore>()(
   persist(
@@ -78,28 +102,7 @@ export const useHistoryStore = create<HistoryStore>()(
       },
 
       getStats: () => {
-        const { sessions } = get();
-        if (sessions.length === 0) {
-          return EMPTY_STATS;
-        }
-
-        const winCount = sessions.filter((s) => s.hitTarget).length;
-        const lossCount = sessions.length - winCount;
-        const totalPnl = sessions.reduce((sum, s) => sum + s.finalPnl, 0);
-        const totalRounds = sessions.reduce((sum, s) => sum + s.roundsPlayed, 0);
-        const pnls = sessions.map((s) => s.finalPnl);
-
-        return {
-          totalSessions: sessions.length,
-          winCount,
-          lossCount,
-          winRate: (winCount / sessions.length) * 100,
-          totalPnl,
-          avgPnl: totalPnl / sessions.length,
-          avgRounds: totalRounds / sessions.length,
-          bestSession: Math.max(...pnls),
-          worstSession: Math.min(...pnls),
-        };
+        return calculateHistoryStats(get().sessions);
       },
     }),
     {

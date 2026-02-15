@@ -1,13 +1,19 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Capacitor } from "@capacitor/core";
 import { useSessionStore, useHistoryStore, usePremiumStore } from "@/store";
+import { calculateHistoryStats } from "@/store/history-store";
+import { hasPremiumEntitlement } from "@/store/premium-store";
 
 export default function Home() {
   const isSessionActive = useSessionStore((s) => s.isSessionActive);
-  const stats = useHistoryStore((s) => s.getStats());
-  const hasPremiumAccess = usePremiumStore((s) => s.hasPremiumAccess());
+  const sessions = useHistoryStore((s) => s.sessions);
+  const isPremium = usePremiumStore((s) => s.isPremium);
+  const premiumExpiresAt = usePremiumStore((s) => s.expiresAt);
+  const stats = useMemo(() => calculateHistoryStats(sessions), [sessions]);
+  const hasPremiumAccess = hasPremiumEntitlement(isPremium, premiumExpiresAt);
 
   const isNative = Capacitor.isNativePlatform();
   const premiumRequired = isNative && !hasPremiumAccess;

@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useHistoryStore } from "@/store";
 import { Button, Card, CardContent } from "@/components/ui";
 import { formatStake } from "@/engine";
+import { calculateHistoryStats } from "@/store/history-store";
 
 export default function HistoryPage() {
   const sessions = useHistoryStore((s) => s.sessions);
-  const getStats = useHistoryStore((s) => s.getStats);
   const clearHistory = useHistoryStore((s) => s.clearHistory);
   const removeSession = useHistoryStore((s) => s.removeSession);
   const [showConfirmClear, setShowConfirmClear] = useState(false);
 
-  const stats = getStats();
+  const stats = useMemo(() => calculateHistoryStats(sessions), [sessions]);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
