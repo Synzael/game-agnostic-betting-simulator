@@ -1,0 +1,93 @@
+# Test: Complete Losing Session
+# Simulates a losing session and handles decision points
+# Note: Requires premium to be active (run 00-activate-premium first)
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app (preserve premium state)
+- launchApp:
+    clearState: false
+
+# Wait for home screen
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Navigate to setup
+- tapOn:
+    text: "Start Session"
+
+# Wait for setup page
+- extendedWaitUntil:
+    visible:
+      text: "New Session"
+    timeout: 5000
+
+# Scroll down to find Start Session button
+- scrollUntilVisible:
+    element:
+      text: "Start Session"
+    direction: DOWN
+    timeout: 5000
+
+# Start session
+- tapOn:
+    text: "Start Session"
+
+# Wait for modal to appear and confirm warning
+- extendedWaitUntil:
+    visible:
+      text: "CANCEL"
+    timeout: 10000
+- tapOn:
+    text: "UNDERSTAND"
+
+# Now on session page - start losing
+- extendedWaitUntil:
+    visible:
+      text: "LOSS"
+    timeout: 5000
+
+# Lose multiple bets
+- repeat:
+    times: 6
+    commands:
+      - runFlow:
+          when:
+            visible: "LOSS"
+          commands:
+            - tapOn:
+                text: "LOSS"
+            - waitForAnimationToEnd
+
+# Take screenshot
+- takeScreenshot: after-losses
+
+# Check if decision screen appeared (ladder top)
+- runFlow:
+    when:
+      visible: "Decision Point"
+    commands:
+      - takeScreenshot: decision-point
+      - tapOn:
+          text: "Stop Session"
+
+# Now should be on summary
+- extendedWaitUntil:
+    visible:
+      text: "Go Home"
+    timeout: 5000
+
+- takeScreenshot: loss-summary
+
+- tapOn:
+    text: "Go Home"
+
+# Verify back on home
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 5000

@@ -1,0 +1,73 @@
+# Test: Complete Winning Session
+# Simulates a winning session by tapping WIN multiple times
+# Note: Requires premium to be active (run 00-activate-premium first)
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app (preserve premium state)
+- launchApp:
+    clearState: false
+
+# Wait for home screen
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Navigate to setup
+- tapOn:
+    text: "Start Session"
+
+# Wait for setup page
+- extendedWaitUntil:
+    visible:
+      text: "New Session"
+    timeout: 5000
+
+# Scroll down to find Start Session button
+- scrollUntilVisible:
+    element:
+      text: "Start Session"
+    direction: DOWN
+    timeout: 5000
+
+# Start with defaults
+- tapOn:
+    text: "Start Session"
+
+# Wait for modal animation and tap I UNDERSTAND button (tap by percentage)
+- waitForAnimationToEnd
+- tapOn:
+    point: "70%,56%"
+
+# Verify we're on session page by checking for ROUND indicator
+- waitForAnimationToEnd
+
+# Take screenshot of session page
+- takeScreenshot: session-page
+
+# Scroll down to find bet buttons
+- scroll
+
+# Look for Continue button (At Bridging Only mode default)
+# or tap End to finish the test
+- waitForAnimationToEnd
+- takeScreenshot: session-scrolled
+
+# End the session using tap on approximate End button location
+- tapOn:
+    point: "90%,5%"
+
+# Should be on summary now - tap Go Home
+- waitForAnimationToEnd
+- takeScreenshot: summary-page
+
+# Tap Go Home button (approximate location)
+- tapOn:
+    point: "50%,85%"
+
+# Verify back on home
+- waitForAnimationToEnd
+- takeScreenshot: back-home

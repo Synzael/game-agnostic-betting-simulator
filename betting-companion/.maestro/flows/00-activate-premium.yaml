@@ -1,0 +1,52 @@
+# Test: Activate Premium (Setup Flow)
+# This flow activates dev premium override for testing
+# Run this first before other tests, or include via runFlow
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app fresh
+- launchApp:
+    clearState: true
+
+# Wait for home screen
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Check if already premium (Start Session visible) or need to unlock
+- runFlow:
+    when:
+      visible: "Premium Unlock Needed"
+    commands:
+      # Tap the premium unlock button
+      - tapOn:
+          text: "Unlock Premium"
+
+      # Wait for premium page
+      - extendedWaitUntil:
+          visible:
+            text: "Premium Access"
+          timeout: 5000
+
+      # Tap Mark Premium (dev override button)
+      - tapOn:
+          text: "Mark Premium"
+
+      # Verify premium activated
+      - assertVisible:
+          text: "Premium Active"
+
+      # Go back to home
+      - tapOn:
+          text: "← Back"
+
+      # Verify Start Session now visible
+      - extendedWaitUntil:
+          visible:
+            text: "Start Session"
+          timeout: 5000
+
+- takeScreenshot: premium-activated

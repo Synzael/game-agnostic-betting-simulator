@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --webpack",
-    "build:native": "NATIVE_BUILD=1 next build --webpack && find out -name '*.map' -delete",
+    "build:native": "NATIVE_BUILD=1 NEXT_PUBLIC_ALLOW_DEV_PREMIUM_OVERRIDE=1 next build --webpack && find out -name '*.map' -delete",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
