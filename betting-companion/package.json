@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --webpack",
-    "build:native": "NATIVE_BUILD=1 next build --webpack",
+    "build:native": "NATIVE_BUILD=1 next build --webpack && find out -name '*.map' -delete",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@capacitor/core": "^7.4.3",
+    "@capacitor/splash-screen": "^7.0.5",
     "idb": "^8.0.3",
     "next": "16.1.6",
     "next-pwa": "^5.6.0",
