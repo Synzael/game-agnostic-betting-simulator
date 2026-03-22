@@ -130,11 +130,39 @@ export default function Home() {
             </div>
           </div>
         </Link>
+
+        <Link
+          href={premiumRequired ? "/premium" : "/card-counting"}
+          className="block animate-fadeInUp stagger-3"
+        >
+          <div
+            className={`card-noir p-5 group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-[var(--emerald)] ${
+              premiumRequired ? "opacity-60" : ""
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-[var(--emerald)]/15 flex items-center justify-center">
+                <svg className="w-7 h-7 text-[var(--emerald)]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 5a2 2 0 012-2h2.5a1 1 0 010 2H5v10h10v-2.5a1 1 0 112 0V15a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+                  <path d="M13 3a1 1 0 011 1v2h2a1 1 0 110 2h-2v2a1 1 0 11-2 0V8h-2a1 1 0 010-2h2V4a1 1 0 011-1z" />
+                </svg>
+              </div>
+              <div>
+                <div className="font-display text-xl text-champagne">
+                  Card Counting
+                </div>
+                <div className="text-xs text-secondary mt-0.5">
+                  Live Dragon 7 and Panda 8 shoe tracker
+                </div>
+              </div>
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Quick Stats */}
       {stats.totalSessions > 0 && (
-        <div className="mt-8 card-noir p-5 max-w-md mx-auto w-full animate-fadeInUp stagger-3">
+        <div className="mt-8 card-noir p-5 max-w-md mx-auto w-full animate-fadeInUp stagger-4">
           <div className="text-[10px] text-muted uppercase tracking-[0.15em] mb-4">
             Quick Stats
           </div>
