@@ -3,14 +3,15 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSessionStore } from "@/store";
-import { Button } from "@/components/ui";
+import { useSessionStore, useCountingStore } from "@/store";
+import { Button, Toggle } from "@/components/ui";
 import {
   BetInputPanel,
   PnLDisplay,
   LadderDisplay,
   RecoveryBanner,
   SessionStats,
+  CardCountingPanel,
 } from "@/components/session";
 
 export default function SessionPage() {
@@ -18,6 +19,8 @@ export default function SessionPage() {
   const state = useSessionStore((s) => s.state);
   const isDecisionPending = useSessionStore((s) => s.isDecisionPending);
   const makeDecision = useSessionStore((s) => s.makeDecision);
+  const countingEnabled = useCountingStore((s) => s.enabled);
+  const setCountingEnabled = useCountingStore((s) => s.setEnabled);
 
   // Redirect to decision screen if decision pending
   useEffect(() => {
@@ -69,11 +72,19 @@ export default function SessionPage() {
           <Link href="/" className="text-secondary hover:text-champagne text-sm transition-colors">
             <span className="text-gold mr-1">&larr;</span> Home
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted uppercase tracking-wider">Round</span>
-            <span className="font-display text-xl text-gold">
-              {state.rounds}
-            </span>
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={countingEnabled}
+              onChange={setCountingEnabled}
+              label="Count"
+              size="sm"
+            />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-muted uppercase tracking-wider">Round</span>
+              <span className="font-display text-xl text-gold">
+                {state.rounds}
+              </span>
+            </div>
           </div>
           <Button
             variant="ghost"
@@ -104,6 +115,13 @@ export default function SessionPage() {
         <div className="animate-fadeInUp stagger-2">
           <SessionStats />
         </div>
+
+        {/* Card Counting Panel (when enabled) */}
+        {countingEnabled && (
+          <div className="animate-fadeInUp stagger-3">
+            <CardCountingPanel />
+          </div>
+        )}
       </main>
 
       {/* Bottom Action Area */}

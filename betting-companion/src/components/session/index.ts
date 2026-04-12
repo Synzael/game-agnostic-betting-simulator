@@ -5,3 +5,4 @@ export { PnLDisplay } from "./PnLDisplay";
 export { LadderDisplay } from "./LadderDisplay";
 export { RecoveryBanner } from "./RecoveryBanner";
 export { SessionStats } from "./SessionStats";
+export { CardCountingPanel } from "./CardCountingPanel";

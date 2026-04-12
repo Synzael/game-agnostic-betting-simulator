@@ -1,20 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
 
 import { CardCountingHUD } from "@/components/card-counting/CardCountingHUD";
 import { Button } from "@/components/ui";
 import type { CardRank } from "@/engine";
-import { useCardCounting } from "@/hooks/useCardCounting";
+import { useCountingStore } from "@/store";
+import type { EventLogEntry } from "@/store/counting-store";
 
-type EventType = "card" | "burn" | "hand" | "reset";
-
-interface EventLogEntry {
-  readonly id: number;
-  readonly label: string;
-  readonly type: EventType;
-}
+type EventType = EventLogEntry["type"];
 
 const RANK_BUTTONS: ReadonlyArray<{
   readonly rank: CardRank;
@@ -47,16 +41,14 @@ function formatRank(rank: CardRank): string {
 }
 
 export default function CardCountingPage() {
-  const { state, cardSeen, completeHand, resetShoe, setBetSize, getBurnCount } =
-    useCardCounting();
-  const [eventLog, setEventLog] = useState<readonly EventLogEntry[]>([]);
-  const eventIdRef = useRef(0);
-
-  function pushEvent(label: string, type: EventType): void {
-    eventIdRef.current += 1;
-    const nextId = eventIdRef.current;
-    setEventLog((currentLog) => [{ id: nextId, label, type }, ...currentLog].slice(0, 12));
-  }
+  const snapshot = useCountingStore((s) => s.snapshot);
+  const cardSeen = useCountingStore((s) => s.cardSeen);
+  const completeHand = useCountingStore((s) => s.completeHand);
+  const resetShoe = useCountingStore((s) => s.resetShoe);
+  const setBetSize = useCountingStore((s) => s.setBetSize);
+  const getBurnCount = useCountingStore((s) => s.getBurnCount);
+  const pushEvent = useCountingStore((s) => s.pushEvent);
+  const eventLog = useCountingStore((s) => s.eventLog);
 
   function handleCardSeen(rank: CardRank): void {
     cardSeen(rank);
@@ -91,7 +83,7 @@ export default function CardCountingPage() {
                 href="/"
                 className="text-sm uppercase tracking-[0.2em] text-secondary transition-colors hover:text-champagne"
               >
-                ← Back Home
+                &larr; Back Home
               </Link>
               <h1 className="mt-3 font-display text-4xl text-champagne">
                 EZ Baccarat Card Counting
@@ -103,14 +95,14 @@ export default function CardCountingPage() {
               </p>
             </div>
             <div className="rounded-full border border-[var(--gold-dim)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-gold">
-              8-deck shoe • 14-card cut • 1 hand after cut
+              8-deck shoe &bull; 14-card cut &bull; 1 hand after cut
             </div>
           </div>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_380px]">
           <CardCountingHUD
-            state={state}
+            state={snapshot}
             onBetSizeChange={setBetSize}
             onResetShoe={handleResetShoe}
           />
