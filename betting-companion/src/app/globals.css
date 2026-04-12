@@ -527,6 +527,12 @@ body::before {
    Safe Area (PWA)
    ============================================ */
 
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-top {
+    padding-top: max(24px, env(safe-area-inset-top));
+  }
+}
+
 @supports (padding: env(safe-area-inset-bottom)) {
   .safe-bottom {
     padding-bottom: max(16px, env(safe-area-inset-bottom));

@@ -1,0 +1,27 @@
+# Test: App Launch
+# Verifies the app launches correctly and shows the home screen
+# Note: Run 00-activate-premium first if testing on native
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app (don't clear state to preserve premium)
+- launchApp:
+    clearState: false
+
+# Wait for app to load
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Check for Start Session (premium active)
+- assertVisible:
+    text: "Start Session"
+
+- assertVisible:
+    text: "History"
+
+# Take a screenshot
+- takeScreenshot: home-screen

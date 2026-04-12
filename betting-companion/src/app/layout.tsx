@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AndroidSafeArea } from "@/components/AndroidSafeArea";
 
 export const metadata: Metadata = {
   title: "Betting Companion",
@@ -35,6 +36,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased bg-slate-900">
+        <AndroidSafeArea />
         {children}
       </body>
     </html>

@@ -1,0 +1,44 @@
+# Test: History View
+# Verifies history page loads and displays session data
+# Note: Run after completing at least one session test
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app (don't clear state to preserve history)
+- launchApp:
+    clearState: false
+
+# Wait for home screen
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Check if Quick Stats visible (indicates previous sessions)
+- runFlow:
+    when:
+      visible: "Quick Stats"
+    commands:
+      - takeScreenshot: home-with-stats
+
+# Tap History
+- tapOn:
+    text: "History"
+
+# Wait a moment for page to load
+- waitForAnimationToEnd
+
+# Take screenshot
+- takeScreenshot: history-page
+
+# Navigate back home
+- tapOn:
+    text: "← Back"
+
+# Verify we're back home
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 5000

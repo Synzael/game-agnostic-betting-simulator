@@ -18,6 +18,15 @@ export type {
   AppSettings,
 } from "./types";
 
+export type {
+  SideBetKey,
+  CountZone,
+  CardRank,
+  CountingEngineConfig,
+  SideBetSnapshot,
+  CountingSnapshot,
+} from "./countingEngine";
+
 // Ladder utilities
 export {
   createLadder,
@@ -56,3 +65,5 @@ export {
   isWinningSession,
   getLadderName,
 } from "./session";
+
+export { CountingEngine, DEFAULT_COUNTING_ENGINE_CONFIG } from "./countingEngine";

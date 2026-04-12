@@ -1,0 +1,99 @@
+# Test: Session Setup Flow
+# Verifies user can navigate through session setup and start a session
+# Note: Requires premium to be active (run 00-activate-premium first)
+
+appId: com.synzael.betcompanion
+
+---
+
+# Launch the app (preserve state including premium)
+- launchApp:
+    clearState: false
+
+# Wait for home screen
+- extendedWaitUntil:
+    visible:
+      text: "Velvet Stakes"
+    timeout: 10000
+
+# Tap Start Session
+- tapOn:
+    text: "Start Session"
+
+# Verify we're on setup page
+- extendedWaitUntil:
+    visible:
+      text: "New Session"
+    timeout: 5000
+
+- assertVisible:
+    text: "Strategy Preset"
+
+- assertVisible:
+    text: "Session Settings"
+
+# Take screenshot of setup page
+- takeScreenshot: setup-page
+
+# Scroll down to see all options
+- scroll
+
+# Verify starting ladder section
+- assertVisible:
+    text: "Starting Ladder"
+
+# Verify decision mode section
+- assertVisible:
+    text: "Decision Mode"
+
+# Scroll to Start Session button
+- scrollUntilVisible:
+    element:
+      text: "Start Session"
+    direction: DOWN
+    timeout: 5000
+
+# Tap Start Session button
+- tapOn:
+    text: "Start Session"
+
+# Wait for warning modal to appear
+- extendedWaitUntil:
+    visible:
+      text: "CANCEL"
+    timeout: 10000
+
+# Take screenshot of warning
+- takeScreenshot: warning-modal
+
+# Confirm warning
+- tapOn:
+    text: "UNDERSTAND"
+
+# Verify we're on session page
+- extendedWaitUntil:
+    visible:
+      text: "WIN"
+    timeout: 5000
+
+- assertVisible:
+    text: "LOSS"
+
+- assertVisible:
+    text: "Current Stake"
+
+# Take screenshot of session page
+- takeScreenshot: session-page
+
+# End session to clean up
+- tapOn:
+    text: "End"
+
+# Confirm on summary page
+- extendedWaitUntil:
+    visible:
+      text: "Go Home"
+    timeout: 5000
+
+- tapOn:
+    text: "Go Home"
