@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSessionStore } from "@/store";
 import { formatStake } from "@/engine";
 import { BridgingDecision } from "@/engine/types";
+import { AdventureGraph } from "@/components/graph";
 
 export function DecisionScreen() {
   const router = useRouter();
@@ -53,6 +54,11 @@ export function DecisionScreen() {
         <p className="text-secondary text-sm max-w-xs mx-auto">
           You&apos;ve reached the top of <span className="text-gold">{strategy.ladders[state.currentLadder].name}</span>. What will you do?
         </p>
+      </div>
+
+      {/* Adventure Graph */}
+      <div className="mb-4 animate-fadeInUp stagger-1">
+        <AdventureGraph />
       </div>
 
       {/* Current Status */}

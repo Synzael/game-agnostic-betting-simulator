@@ -31,6 +31,7 @@ describe('useSessionStore', () => {
       decisionMode: 'at_bridging_only',
       state: null,
       betHistory: [],
+      sessionEvents: [],
       startTime: null,
     });
   });
@@ -225,6 +226,134 @@ describe('useSessionStore', () => {
       expect(state?.currentLadder).toBe(0);
       expect(state?.currentIndex).toBe(0);
       expect(state?.awaitingDecision).toBe(false);
+    });
+  });
+
+  describe('sessionEvents', () => {
+    const awaitBridgingDecision = (overrides: Record<string, unknown> = {}) => {
+      useSessionStore.setState((prev) => ({
+        ...prev,
+        state: prev.state
+          ? {
+              ...prev.state,
+              awaitingDecision: true,
+              pendingDecisionType: 'bridging' as const,
+              ...overrides,
+            }
+          : null,
+      }));
+    };
+
+    beforeEach(() => {
+      const config = createTestConfig();
+      const strategy = createTestStrategy();
+      useSessionStore.getState().startSession(config, strategy);
+    });
+
+    it('starts with no events', () => {
+      expect(useSessionStore.getState().sessionEvents).toEqual([]);
+    });
+
+    it('records a carry_over event with round, pnl, and ladder transition', () => {
+      awaitBridgingDecision({
+        currentLadder: 0,
+        currentIndex: 4,
+        rounds: 7,
+        pnl: -150,
+      });
+
+      useSessionStore.getState().makeDecision('carry_over');
+
+      const { sessionEvents, state } = useSessionStore.getState();
+      expect(sessionEvents.length).toBe(1);
+      expect(sessionEvents[0].type).toBe('carry_over');
+      expect(sessionEvents[0].round).toBe(7);
+      expect(sessionEvents[0].pnlAt).toBe(-150);
+      expect(sessionEvents[0].fromLadder).toBe(0);
+      expect(sessionEvents[0].toLadder).toBe(state?.currentLadder);
+      expect(sessionEvents[0].timestamp).toBeDefined();
+    });
+
+    it('records a write_off event resetting to ladder 0', () => {
+      awaitBridgingDecision({
+        currentLadder: 1,
+        currentIndex: 3,
+        rounds: 12,
+        pnl: -400,
+      });
+
+      useSessionStore.getState().makeDecision('write_off');
+
+      const { sessionEvents } = useSessionStore.getState();
+      expect(sessionEvents.length).toBe(1);
+      expect(sessionEvents[0].type).toBe('write_off');
+      expect(sessionEvents[0].round).toBe(12);
+      expect(sessionEvents[0].pnlAt).toBe(-400);
+      expect(sessionEvents[0].fromLadder).toBe(1);
+      expect(sessionEvents[0].toLadder).toBe(0);
+    });
+
+    it('does not record an event for stop_session', () => {
+      awaitBridgingDecision();
+      useSessionStore.getState().makeDecision('stop_session');
+      expect(useSessionStore.getState().sessionEvents).toEqual([]);
+    });
+
+    it('does not record an event for every_bet continue decisions', () => {
+      useSessionStore.setState((prev) => ({
+        ...prev,
+        state: prev.state
+          ? {
+              ...prev.state,
+              awaitingDecision: true,
+              pendingDecisionType: 'every_bet' as const,
+            }
+          : null,
+      }));
+
+      useSessionStore.getState().makeDecision('carry_over');
+
+      expect(useSessionStore.getState().sessionEvents).toEqual([]);
+    });
+
+    it('accumulates multiple events', () => {
+      awaitBridgingDecision({ currentLadder: 0, currentIndex: 4 });
+      useSessionStore.getState().makeDecision('carry_over');
+
+      awaitBridgingDecision({ currentLadder: 1, currentIndex: 3 });
+      useSessionStore.getState().makeDecision('write_off');
+
+      const { sessionEvents } = useSessionStore.getState();
+      expect(sessionEvents.map((event) => event.type)).toEqual([
+        'carry_over',
+        'write_off',
+      ]);
+    });
+
+    it('clears events on startSession', () => {
+      awaitBridgingDecision({ currentLadder: 1, currentIndex: 3 });
+      useSessionStore.getState().makeDecision('write_off');
+      expect(useSessionStore.getState().sessionEvents.length).toBe(1);
+
+      useSessionStore.getState().startSession(createTestConfig(), createTestStrategy());
+      expect(useSessionStore.getState().sessionEvents).toEqual([]);
+    });
+
+    it('clears events on resetSession', () => {
+      awaitBridgingDecision({ currentLadder: 1, currentIndex: 3 });
+      useSessionStore.getState().makeDecision('write_off');
+
+      useSessionStore.getState().resetSession();
+      expect(useSessionStore.getState().sessionEvents).toEqual([]);
+    });
+
+    it('includes events in endSession result', () => {
+      awaitBridgingDecision({ currentLadder: 1, currentIndex: 3 });
+      useSessionStore.getState().makeDecision('write_off');
+
+      const result = useSessionStore.getState().endSession();
+      expect(result?.events?.length).toBe(1);
+      expect(result?.events?.[0].type).toBe('write_off');
     });
   });
 

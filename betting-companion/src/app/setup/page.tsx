@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSessionStore } from "@/store";
-import { Button, Card, NumberInput } from "@/components/ui";
+import { useSessionStore, useSettingsStore } from "@/store";
+import { Button, Card, NumberInput, Toggle } from "@/components/ui";
 import {
   getAllPresets,
   createStrategyFromPreset,
@@ -46,6 +46,8 @@ export default function SetupPage() {
   const startSession = useSessionStore((s) => s.startSession);
   const setDecisionMode = useSessionStore((s) => s.setDecisionMode);
   const decisionMode = useSessionStore((s) => s.decisionMode);
+  const showBetNumbers = useSettingsStore((s) => s.showBetNumbers);
+  const setShowBetNumbers = useSettingsStore((s) => s.setShowBetNumbers);
 
   const presets = getAllPresets();
   const [selectedPreset, setSelectedPreset] = useState<string>("default");
@@ -226,6 +228,30 @@ export default function SetupPage() {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* Display */}
+        <div>
+          <h2 className="text-sm text-slate-400 uppercase tracking-wide mb-3">
+            Display
+          </h2>
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-white text-sm">
+                  Bet amounts on graph
+                </div>
+                <div className="text-xs text-slate-400 mt-1">
+                  Show win/loss stakes next to each point
+                </div>
+              </div>
+              <Toggle
+                checked={showBetNumbers}
+                onChange={setShowBetNumbers}
+                size="sm"
+              />
+            </div>
+          </Card>
         </div>
 
         {/* Start Button */}

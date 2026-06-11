@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSessionStore, useCountingStore } from "@/store";
 import { Button, Toggle } from "@/components/ui";
+import { AdventureGraph } from "@/components/graph";
 import {
   BetInputPanel,
   PnLDisplay,
@@ -98,6 +99,11 @@ export default function SessionPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 space-y-4 overflow-auto">
+        {/* Adventure Graph */}
+        <div className="animate-fadeInUp">
+          <AdventureGraph />
+        </div>
+
         {/* Recovery Banner (if in recovery) */}
         <RecoveryBanner />
 

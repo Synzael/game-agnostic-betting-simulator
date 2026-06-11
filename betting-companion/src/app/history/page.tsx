@@ -6,6 +6,7 @@ import { useHistoryStore } from "@/store";
 import { Button, Card, CardContent } from "@/components/ui";
 import { formatStake } from "@/engine";
 import { calculateHistoryStats } from "@/store/history-store";
+import { SessionGraph, stopReasonFromResult } from "@/components/graph";
 
 export default function HistoryPage() {
   const sessions = useHistoryStore((s) => s.sessions);
@@ -178,6 +179,17 @@ export default function HistoryPage() {
                     </div>
                   </div>
                 </div>
+                {session.betHistory && session.betHistory.length > 0 && (
+                  <div className="mt-3">
+                    <SessionGraph
+                      betHistory={session.betHistory}
+                      events={session.events}
+                      stopReason={stopReasonFromResult(session)}
+                      showBetNumbers={false}
+                      height={70}
+                    />
+                  </div>
+                )}
                 <button
                   onClick={() => removeSession(session.id)}
                   className="absolute top-2 right-2 text-slate-600 hover:text-slate-400 text-xs p-1"
