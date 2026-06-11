@@ -97,6 +97,20 @@ export interface SessionState {
 }
 
 /**
+ * Roguelike adventure event recorded when the player makes a
+ * bridging decision. Terminal outcomes are not logged here — they
+ * are derivable from SessionState.stopReason / SessionResult flags.
+ */
+export interface SessionEvent {
+  readonly round: number;
+  readonly timestamp: number;
+  readonly type: "carry_over" | "write_off";
+  readonly pnlAt: number;
+  readonly fromLadder: number;
+  readonly toLadder: number;
+}
+
+/**
  * Single bet record for history tracking.
  */
 export interface BetRecord {
@@ -144,6 +158,9 @@ export interface SessionResult {
 
   // Bet history (optional, for replay)
   readonly betHistory?: readonly BetRecord[];
+
+  // Bridging decision events (optional, for adventure graph)
+  readonly events?: readonly SessionEvent[];
 }
 
 /**

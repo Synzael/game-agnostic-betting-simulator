@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSessionStore, useHistoryStore } from "@/store";
 import { Button } from "@/components/ui";
 import { formatStake, getStopReasonText, isWinningSession } from "@/engine";
+import { AdventureGraph } from "@/components/graph";
 
 export default function SummaryPage() {
   const router = useRouter();
@@ -95,6 +96,11 @@ export default function SummaryPage() {
           {state.pnl >= 0 ? "+" : ""}
           {formatStake(state.pnl)}
         </div>
+      </div>
+
+      {/* Adventure Graph */}
+      <div className="max-w-md mx-auto animate-fadeInUp stagger-1">
+        <AdventureGraph height={140} />
       </div>
 
       {/* Decorative divider */}

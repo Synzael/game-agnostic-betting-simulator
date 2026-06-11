@@ -13,6 +13,7 @@ import {
   StrategyConfig,
   BridgingDecision,
   BetRecord,
+  SessionEvent,
   SessionResult,
   DecisionMode,
 } from "@/engine/types";
@@ -33,6 +34,7 @@ interface SessionStore {
   // Active session state
   state: SessionState | null;
   betHistory: BetRecord[];
+  sessionEvents: SessionEvent[];
   startTime: number | null;
 
   // Actions
@@ -58,6 +60,7 @@ export const useSessionStore = create<SessionStore>()(
       decisionMode: "at_bridging_only",
       state: null,
       betHistory: [],
+      sessionEvents: [],
       startTime: null,
 
       startSession: (config, strategy) => {
@@ -66,6 +69,7 @@ export const useSessionStore = create<SessionStore>()(
           strategy,
           state: createInitialState(strategy, config.startingLadder),
           betHistory: [],
+          sessionEvents: [],
           startTime: Date.now(),
         });
       },
@@ -107,15 +111,38 @@ export const useSessionStore = create<SessionStore>()(
       },
 
       makeDecision: (decision) => {
-        const { state, strategy } = get();
+        const { state, strategy, sessionEvents } = get();
         if (!state || !strategy || !state.awaitingDecision) return;
 
         const newState = processBridgingDecision(state, strategy, decision);
-        set({ state: newState });
+
+        // Log roguelike adventure events for the graph. Only bridging
+        // carry_over/write_off are recorded — stop/terminal outcomes are
+        // derivable from stopReason.
+        const isBridgingEvent =
+          state.pendingDecisionType === "bridging" &&
+          (decision === "carry_over" || decision === "write_off");
+
+        const newEvent: SessionEvent | null = isBridgingEvent
+          ? {
+              round: state.rounds,
+              timestamp: Date.now(),
+              type: decision as "carry_over" | "write_off",
+              pnlAt: state.pnl,
+              fromLadder: state.currentLadder,
+              toLadder: newState.currentLadder,
+            }
+          : null;
+
+        set({
+          state: newState,
+          sessionEvents: newEvent ? [...sessionEvents, newEvent] : sessionEvents,
+        });
       },
 
       endSession: () => {
-        const { state, config, strategy, betHistory, startTime } = get();
+        const { state, config, strategy, betHistory, sessionEvents, startTime } =
+          get();
         if (!state || !config || !strategy) return null;
 
         const result: SessionResult = {
@@ -140,6 +167,7 @@ export const useSessionStore = create<SessionStore>()(
           config,
           strategy,
           betHistory,
+          events: sessionEvents,
         };
 
         return result;
@@ -151,6 +179,7 @@ export const useSessionStore = create<SessionStore>()(
           strategy: null,
           state: null,
           betHistory: [],
+          sessionEvents: [],
           startTime: null,
         });
       },
@@ -190,6 +219,7 @@ export const useSessionStore = create<SessionStore>()(
         strategy: state.strategy,
         state: state.state,
         betHistory: state.betHistory,
+        sessionEvents: state.sessionEvents,
         startTime: state.startTime,
         decisionMode: state.decisionMode,
       }),

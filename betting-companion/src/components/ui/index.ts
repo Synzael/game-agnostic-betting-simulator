@@ -10,3 +10,4 @@ export {
   CardFooter,
 } from "./Card";
 export { Input, NumberInput } from "./Input";
+export { Toggle } from "./Toggle";
