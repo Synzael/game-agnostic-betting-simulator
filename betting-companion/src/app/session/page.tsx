@@ -3,7 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSessionStore, useCountingStore } from "@/store";
+import {
+  useSessionStore,
+  useCountingStore,
+  useCardCountingAccessStore,
+} from "@/store";
 import { Button, Toggle } from "@/components/ui";
 import { AdventureGraph } from "@/components/graph";
 import {
@@ -22,6 +26,11 @@ export default function SessionPage() {
   const makeDecision = useSessionStore((s) => s.makeDecision);
   const countingEnabled = useCountingStore((s) => s.enabled);
   const setCountingEnabled = useCountingStore((s) => s.setEnabled);
+  const countingApprovedHash = useCardCountingAccessStore(
+    (s) => s.approvedEmailHash
+  );
+  const countingUnlocked = useCardCountingAccessStore((s) => s.unlocked);
+  const cardCountingAccess = countingApprovedHash !== null && countingUnlocked;
 
   // Redirect to decision screen if decision pending
   useEffect(() => {
@@ -74,12 +83,14 @@ export default function SessionPage() {
             <span className="text-gold mr-1">&larr;</span> Home
           </Link>
           <div className="flex items-center gap-3">
-            <Toggle
-              checked={countingEnabled}
-              onChange={setCountingEnabled}
-              label="Count"
-              size="sm"
-            />
+            {cardCountingAccess && (
+              <Toggle
+                checked={countingEnabled}
+                onChange={setCountingEnabled}
+                label="Count"
+                size="sm"
+              />
+            )}
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-muted uppercase tracking-wider">Round</span>
               <span className="font-display text-xl text-gold">
@@ -122,8 +133,8 @@ export default function SessionPage() {
           <SessionStats />
         </div>
 
-        {/* Card Counting Panel (when enabled) */}
-        {countingEnabled && (
+        {/* Card Counting Panel (when unlocked and enabled) */}
+        {cardCountingAccess && countingEnabled && (
           <div className="animate-fadeInUp stagger-3">
             <CardCountingPanel />
           </div>
