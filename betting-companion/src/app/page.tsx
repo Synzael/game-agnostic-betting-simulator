@@ -1,22 +1,52 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Capacitor } from "@capacitor/core";
-import { useSessionStore, useHistoryStore, usePremiumStore } from "@/store";
+import {
+  useSessionStore,
+  useHistoryStore,
+  usePremiumStore,
+  useCardCountingAccessStore,
+} from "@/store";
 import { calculateHistoryStats } from "@/store/history-store";
 import { hasPremiumEntitlement } from "@/store/premium-store";
+import { fetchWhitelist } from "@/lib/card-counting-access";
 
 export default function Home() {
   const isSessionActive = useSessionStore((s) => s.isSessionActive);
   const sessions = useHistoryStore((s) => s.sessions);
   const isPremium = usePremiumStore((s) => s.isPremium);
   const premiumExpiresAt = usePremiumStore((s) => s.expiresAt);
+  const approvedEmailHash = useCardCountingAccessStore(
+    (s) => s.approvedEmailHash
+  );
+  const countingUnlocked = useCardCountingAccessStore((s) => s.unlocked);
+  const clearCountingAccess = useCardCountingAccessStore((s) => s.clearAccess);
   const stats = useMemo(() => calculateHistoryStats(sessions), [sessions]);
   const hasPremiumAccess = hasPremiumEntitlement(isPremium, premiumExpiresAt);
+  const cardCountingAccess = approvedEmailHash !== null && countingUnlocked;
 
   const isNative = Capacitor.isNativePlatform();
   const premiumRequired = isNative && !hasPremiumAccess;
+
+  // Re-validate cached approval against the live whitelist so the owner can
+  // revoke access; network failures keep cached access (offline-first).
+  useEffect(() => {
+    if (!approvedEmailHash) return;
+    let cancelled = false;
+
+    void fetchWhitelist().then((result) => {
+      if (cancelled || !result.ok) return;
+      if (!result.whitelist.approvedEmailHashes.includes(approvedEmailHash)) {
+        clearCountingAccess();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [approvedEmailHash, clearCountingAccess]);
 
   return (
     <div className="min-h-screen bg-noir p-4 flex flex-col">
@@ -131,6 +161,7 @@ export default function Home() {
           </div>
         </Link>
 
+        {cardCountingAccess && (
         <Link
           href={premiumRequired ? "/premium" : "/card-counting"}
           className="block animate-fadeInUp stagger-3"
@@ -158,6 +189,7 @@ export default function Home() {
             </div>
           </div>
         </Link>
+        )}
       </div>
 
       {/* Quick Stats */}
@@ -190,6 +222,18 @@ export default function Home() {
               <div className="text-[10px] text-muted uppercase tracking-wider mt-1">Total P&L</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Invite entry (deliberately generic; doesn't reveal gated features) */}
+      {!cardCountingAccess && (
+        <div className="text-center mt-6">
+          <Link
+            href="/unlock"
+            className="text-[11px] text-muted hover:text-secondary tracking-wide underline underline-offset-4"
+          >
+            Have an invite?
+          </Link>
         </div>
       )}
 

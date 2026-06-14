@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { CardCountingHUD } from "@/components/card-counting/CardCountingHUD";
 import { Button } from "@/components/ui";
 import type { CardRank } from "@/engine";
-import { useCountingStore } from "@/store";
+import { useCountingStore, useCardCountingAccessStore } from "@/store";
 import type { EventLogEntry } from "@/store/counting-store";
 
 type EventType = EventLogEntry["type"];
@@ -41,6 +43,13 @@ function formatRank(rank: CardRank): string {
 }
 
 export default function CardCountingPage() {
+  const router = useRouter();
+  const approvedEmailHash = useCardCountingAccessStore(
+    (s) => s.approvedEmailHash
+  );
+  const unlocked = useCardCountingAccessStore((s) => s.unlocked);
+  const hasAccess = approvedEmailHash !== null && unlocked;
+
   const snapshot = useCountingStore((s) => s.snapshot);
   const cardSeen = useCountingStore((s) => s.cardSeen);
   const completeHand = useCountingStore((s) => s.completeHand);
@@ -49,6 +58,27 @@ export default function CardCountingPage() {
   const getBurnCount = useCountingStore((s) => s.getBurnCount);
   const pushEvent = useCountingStore((s) => s.pushEvent);
   const eventLog = useCountingStore((s) => s.eventLog);
+
+  // Persist rehydration is async on a hard load; the gate must not act on
+  // the pre-hydration default state or unlocked users get bounced home.
+  const [accessReady, setAccessReady] = useState(false);
+  useEffect(() => {
+    if (useCardCountingAccessStore.persist.hasHydrated()) {
+      setAccessReady(true);
+      return;
+    }
+    return useCardCountingAccessStore.persist.onFinishHydration(() =>
+      setAccessReady(true)
+    );
+  }, []);
+
+  // Whitelist + paywall gate: locked visitors are sent home (static export
+  // has no middleware, so the guard lives client-side).
+  useEffect(() => {
+    if (accessReady && !hasAccess) {
+      router.replace("/");
+    }
+  }, [accessReady, hasAccess, router]);
 
   function handleCardSeen(rank: CardRank): void {
     cardSeen(rank);
@@ -71,6 +101,10 @@ export default function CardCountingPage() {
   function handleResetShoe(): void {
     resetShoe();
     pushEvent("Shoe reset.", "reset");
+  }
+
+  if (!hasAccess) {
+    return null;
   }
 
   return (

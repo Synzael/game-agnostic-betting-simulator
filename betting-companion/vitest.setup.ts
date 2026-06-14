@@ -1,11 +1,16 @@
 import '@testing-library/jest-dom';
+import { webcrypto } from 'node:crypto';
 
-// Mock crypto.randomUUID for tests
-if (typeof crypto === 'undefined' || !crypto.randomUUID) {
+// jsdom lacks parts of Web Crypto (randomUUID, subtle for SHA-256 hashing);
+// use Node's implementation when anything is missing
+if (
+  typeof crypto === 'undefined' ||
+  !crypto.randomUUID ||
+  !globalThis.crypto?.subtle
+) {
   Object.defineProperty(globalThis, 'crypto', {
-    value: {
-      randomUUID: () => 'test-uuid-' + Math.random().toString(36).substr(2, 9),
-    },
+    value: webcrypto,
+    configurable: true,
   });
 }
 
